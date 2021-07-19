@@ -2,6 +2,7 @@
 
 using namespace std;
 
+// vehicle directions struct for a given road
 struct directions{
     int left;
     int right;
@@ -16,6 +17,8 @@ struct directions{
     }
 };
 
+// Road state 
+// Contains all the directions of vehicles in a given state
 struct road_state{
     struct directions *West;
     struct directions *East;
@@ -29,6 +32,7 @@ struct road_state{
     }
 };
 
+// Base Strategy Interface for the strategies
 class Strategy
 {
     public:
@@ -36,6 +40,7 @@ class Strategy
         virtual void openRoute(struct road_state* rs, int decrement_value) = 0;
 };
 
+// Used to interchange the strategies
 class Context
 {
     private:
@@ -109,6 +114,7 @@ int getValue(int value, int decrement_value)
     }
 };
 
+//Following classes are the different strategies for the road to induce the traffic
 class WestOneStrategy : public Strategy
 {
     public:
@@ -244,10 +250,16 @@ int main()
     struct directions *North = new directions(10, 10, 10, 10);
     struct directions *South = new directions(10, 10, 10, 10);
     struct road_state *rs  = new road_state(West, East, North, South);
+    //Called first strategy
     Context *context = new Context(new WestOneStrategy, rs, 1);
     context->changeRoute();
     context->print_state();
+    //Change the strategy
     context->set_strategy(new WestTwoStrategy, 2);
+    context->changeRoute();
+    context->print_state();
+    //Change the strategy
+    context->set_strategy(new SouthOneStrategy, 3);
     context->changeRoute();
     context->print_state();
     return 0;
