@@ -38,6 +38,7 @@ class Strategy
     public:
         virtual ~Strategy() {}
         virtual void openRoute(struct road_state* rs, int decrement_value) = 0;
+        virtual int get_max(struct road_state* rs) = 0;
 };
 
 // Used to interchange the strategies
@@ -76,28 +77,22 @@ class Context
             this->_strategy->openRoute(this->_rs, this->decrement_value);
         }
 
-        void print_state()
+        int get_strategy_values()
         {
-            cout << "West" << endl;
-            cout << "straight-->" << this->_rs->West->straight << endl;
-            cout << "left-->" << this->_rs->West->left << endl;
-            cout << "right-->" << this->_rs->West->right << endl;
-            cout << "uturn-->" << this->_rs->West->uturn << endl;
-            cout << "East" << endl;
-            cout << "straight-->" << this->_rs->East->straight << endl;
-            cout << "left-->" << this->_rs->East->left << endl;
-            cout << "right-->" << this->_rs->East->right << endl;
-            cout << "uturn-->" << this->_rs->East->uturn << endl;
-            cout << "North" << endl;
-            cout << "straight-->" << this->_rs->North->straight << endl;
-            cout << "left-->" << this->_rs->North->left << endl;
-            cout << "right-->" << this->_rs->North->right << endl;
-            cout << "uturn-->" << this->_rs->North->uturn << endl;
-            cout << "South" << endl;
-            cout << "straight-->" << this->_rs->South->straight << endl;
-            cout << "left-->" << this->_rs->South->left << endl;
-            cout << "right-->" << this->_rs->South->right << endl;
-            cout << "uturn-->" << this->_rs->South->uturn << endl;
+             return this->_strategy->get_max(this->_rs);
+        }
+
+        void print_state(){
+            cout << "###############################################" << endl;
+            cout << "eastOne::" << this->_rs->East->straight << "," << this->_rs->North->right << "," <<  this->_rs->East->left << "," << this->_rs->North->uturn << endl;
+            cout << "eastTwo::" << this->_rs->East->straight << "," << this->_rs->East->right << "," <<  this->_rs->East->left << "," << this->_rs->East->uturn << endl;
+            cout << "westOne::" << this->_rs->West->straight << "," << this->_rs->South->right << "," <<  this->_rs->West->left << "," << this->_rs->South->uturn << endl;
+            cout << "westTwo::" << this->_rs->West->straight << "," << this->_rs->West->right << "," <<  this->_rs->West->left << "," << this->_rs->West->uturn << endl;
+            cout << "northOne::" << this->_rs->North->straight << "," << this->_rs->West->right << "," <<  this->_rs->North->left << "," << this->_rs->West->uturn << endl;
+            cout << "northTwo::" << this->_rs->North->straight << "," << this->_rs->North->right << "," <<  this->_rs->North->left << "," << this->_rs->North->uturn << endl;
+            cout << "southOne::" << this->_rs->South->straight << "," << this->_rs->East->right << "," <<  this->_rs->South->left << "," << this->_rs->East->uturn << endl;
+            cout << "southTwo::" << this->_rs->South->straight << "," << this->_rs->South->right << "," <<  this->_rs->South->left << "," << this->_rs->South->uturn << endl;
+            cout << "###############################################" << endl;
         }
 
 };
@@ -123,11 +118,13 @@ class WestOneStrategy : public Strategy
             rs->West->straight = getValue(rs->West->straight, decrement_value);
             rs->South->right = getValue(rs->South->right, decrement_value);
             rs->West->left = getValue(rs->West->left, decrement_value);
-            rs->East->left = getValue(rs->East->left, decrement_value);
-            rs->North->left = getValue(rs->North->left, decrement_value);
-            rs->South->left = getValue(rs->South->left, decrement_value);
-            rs->West->uturn = getValue(rs->West->uturn, decrement_value);
             rs->South->uturn = getValue(rs->South->uturn, decrement_value);
+        }
+
+    public:
+        int get_max(struct road_state* current_road_state)
+        {
+             return max(max(current_road_state->West->straight, current_road_state->South->right), max(current_road_state->West->left, current_road_state->South->uturn));;
         }
 };
 
@@ -139,11 +136,13 @@ class WestTwoStrategy : public Strategy
             rs->West->straight = getValue(rs->West->straight, decrement_value);
             rs->West->right = getValue(rs->West->right, decrement_value);
             rs->West->left = getValue(rs->West->left, decrement_value);
-            rs->East->left = getValue(rs->East->left, decrement_value);
-            rs->North->left = getValue(rs->North->left, decrement_value);
-            rs->South->left = getValue(rs->South->left, decrement_value);
             rs->West->uturn = getValue(rs->West->uturn , decrement_value);
-            rs->South->uturn = getValue(rs->South->uturn, decrement_value);
+        }
+
+    public:
+        int get_max(struct road_state* current_road_state)
+        {
+             return max(max(current_road_state->West->left, current_road_state->West->right), max(current_road_state->West->straight, current_road_state->West->uturn));
         }
 };
 
@@ -153,13 +152,15 @@ class EastOneStrategy : public Strategy
         void openRoute(struct road_state* rs, int decrement_value)
         {
             rs->East->straight = getValue(rs->East->straight, decrement_value);
-            rs->North->left = getValue(rs->North->left, decrement_value);
-            rs->West->left = getValue(rs->West->left, decrement_value);
+            rs->North->right = getValue(rs->North->right, decrement_value);
             rs->East->left = getValue(rs->East->left, decrement_value);
-            rs->North->left = getValue(rs->North->left, decrement_value);
-            rs->South->left = getValue(rs->South->left, decrement_value);
             rs->North->uturn = getValue(rs->North->uturn, decrement_value);
-            rs->East->uturn = getValue(rs->East->uturn, decrement_value);
+        }
+
+    public:
+        int get_max(struct road_state* current_road_state)
+        {
+             return max(max(current_road_state->East->straight, current_road_state->North->right), max(current_road_state->East->left, current_road_state->North->uturn));
         }
 };
 
@@ -170,12 +171,14 @@ class EastTwoStrategy : public Strategy
         {
             rs->East->straight = getValue(rs->East->straight, decrement_value);
             rs->East->right = getValue(rs->East->right, decrement_value);
-            rs->West->left = getValue(rs->West->left, decrement_value);
             rs->East->left = getValue(rs->East->left, decrement_value);
-            rs->North->left = getValue(rs->North->left, decrement_value);
-            rs->South->left = getValue(rs->South->left, decrement_value);
-            rs->North->uturn = getValue(rs->North->uturn, decrement_value);
             rs->East->uturn = getValue(rs->East->uturn, decrement_value);
+        }
+
+    public:
+        int get_max(struct road_state* current_road_state)
+        {
+             return max(max(current_road_state->East->left, current_road_state->East->right), max(current_road_state->East->straight, current_road_state->East->uturn));
         }
 };
 
@@ -186,12 +189,14 @@ class NorthOneStrategy : public Strategy
         {
             rs->North->straight = getValue(rs->North->straight, decrement_value);
             rs->West->right = getValue(rs->West->right, decrement_value);
-            rs->West->left = getValue(rs->West->left, decrement_value);
-            rs->East->left = getValue(rs->East->left, decrement_value);
             rs->North->left = getValue(rs->North->left, decrement_value);
-            rs->South->left = getValue(rs->South->left , decrement_value);
-            rs->North->uturn = getValue(rs->North->uturn, decrement_value);
             rs->West->uturn = getValue(rs->West->uturn, decrement_value);
+        }
+
+    public:
+        int get_max(struct road_state* current_road_state)
+        {
+             return max(max(current_road_state->North->straight, current_road_state->West->right), max(current_road_state->North->left, current_road_state->West->uturn));
         }
 };
 
@@ -202,12 +207,14 @@ class NorthTwoStrategy : public Strategy
         {
             rs->North->straight = getValue(rs->North->straight, decrement_value);
             rs->North->right = getValue(rs->North->right, decrement_value);
-            rs->West->left = getValue(rs->West->left, decrement_value);
-            rs->East->left = getValue(rs->East->left, decrement_value);
             rs->North->left = getValue(rs->North->left, decrement_value);
-            rs->South->left = getValue(rs->South->left, decrement_value);
             rs->North->uturn = getValue(rs->North->uturn, decrement_value);
-            rs->West->uturn = getValue(rs->West->uturn, decrement_value);
+        }
+
+    public:
+        int get_max(struct road_state* current_road_state)
+        {
+             return max(max(current_road_state->North->left, current_road_state->North->right), max(current_road_state->North->straight, current_road_state->North->uturn));
         }
 };
 
@@ -218,12 +225,14 @@ class SouthOneStrategy : public Strategy
         {
             rs->South->straight = getValue(rs->South->straight, decrement_value);
             rs->East->right = getValue(rs->East->right, decrement_value);
-            rs->West->left = getValue(rs->West->left, decrement_value);
-            rs->East->left = getValue(rs->East->left, decrement_value);
-            rs->North->left = getValue(rs->North->left, decrement_value);
             rs->South->left = getValue(rs->South->left, decrement_value);
             rs->East->uturn = getValue(rs->East->uturn, decrement_value);
-            rs->South->uturn = getValue(rs->South->uturn, decrement_value);
+        }
+
+    public:
+        int get_max(struct road_state* current_road_state)
+        {
+             return max(max(current_road_state->South->straight, current_road_state->East->right), max(current_road_state->South->left, current_road_state->East->uturn));
         }
 };
 
@@ -234,33 +243,36 @@ class SouthTwoStrategy : public Strategy
         {
             rs->South->straight = getValue(rs->South->straight, decrement_value);
             rs->South->right = getValue(rs->South->right, decrement_value);
-            rs->West->left = getValue(rs->West->left, decrement_value);
-            rs->East->left = getValue(rs->East->left, decrement_value);
-            rs->North->left = getValue(rs->North->left, decrement_value);
             rs->South->left = getValue(rs->South->left, decrement_value);
-            rs->East->uturn = getValue(rs->East->uturn, decrement_value);
             rs->South->uturn = getValue(rs->South->uturn, decrement_value);
+        }
+
+    public:
+        int get_max(struct road_state* current_road_state)
+        {
+             return max(max(current_road_state->South->left, current_road_state->South->right), max(current_road_state->South->straight, current_road_state->South->uturn));
         }
 };
 
-int main()
-{
-    struct directions *West = new directions(10, 10, 10, 10);
-    struct directions *East = new directions(10, 10, 10, 10);
-    struct directions *North = new directions(10, 10, 10, 10);
-    struct directions *South = new directions(10, 10, 10, 10);
-    struct road_state *rs  = new road_state(West, East, North, South);
-    //Called first strategy
-    Context *context = new Context(new WestOneStrategy, rs, 1);
-    context->changeRoute();
-    context->print_state();
-    //Change the strategy
-    context->set_strategy(new WestTwoStrategy, 2);
-    context->changeRoute();
-    context->print_state();
-    //Change the strategy
-    context->set_strategy(new SouthOneStrategy, 3);
-    context->changeRoute();
-    context->print_state();
-    return 0;
-}
+// int main()
+// {
+//     struct directions *West = new directions(10, 10, 10, 10);
+//     struct directions *East = new directions(10, 10, 10, 10);
+//     struct directions *North = new directions(10, 10, 10, 10);
+//     struct directions *South = new directions(10, 10, 10, 10);
+//     struct road_state *rs  = new road_state(West, East, North, South);
+//     //Called first strategy
+//     Context *context = new Context(new WestOneStrategy, rs, 1);
+//     context->changeRoute();
+//     // context->print_state();
+//     //Change the strategy
+//     context->set_strategy(new WestTwoStrategy, 2);
+//     context->changeRoute();
+//     // context->print_state();
+//     //Change the strategy
+//     context->set_strategy(new SouthOneStrategy, 3);
+//     context->changeRoute();
+//     // context->print_state();
+//     cout << rs->West->straight << endl;
+//     return 0;
+// }

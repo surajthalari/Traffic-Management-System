@@ -1,0 +1,22 @@
+[
+	{ "northTwo" : 20},
+	{ "northOne" : 40},
+	{ "eastOne" : 45},
+	{ "eastTwo" : 36},
+	{ "westOne" : 30},
+	{ "westTwo" : 23},
+	{ "southOne" : 17},
+	{ "southTwo" : 12},
+	{ "westOne" : 7},
+	{ "southOne" : 7},
+	{ "southTwo" : 6},
+	{ "southOne" : 4},
+	{ "southTwo" : 3},
+	{ "southOne" : 2},
+	{ "southTwo" : 2},
+	{ "southOne" : 1},
+	{ "southTwo" : 1},
+	{ "southOne" : 1},
+	{ "southTwo" : 1},
+	{ "southOne" : 3}
+]
