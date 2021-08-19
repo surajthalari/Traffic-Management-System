@@ -3,9 +3,11 @@
 from flask import Flask, json, jsonify, request
 import flask
 import os
+from flask_cors import CORS
   
 # creating a Flask app
 app = Flask(__name__)
+
 
 def run_algorithm(json_data):
     var = os.system("g++ dqtrr.cpp -o check")
@@ -32,17 +34,15 @@ def home():
 @app.route('/traffic-enable', methods = ['POST'])
 def get_traffic_states():
     json_data = flask.request.json
+    print("#############################")
+    print(json_data)
+    print("#############################")
     return_value = run_algorithm(json_data)
     if(isinstance(return_value, str) is False):
         return_value = jsonify(return_value)
-    # response = app.response_class(
-    #     response=return_value,
-    #     status=200,
-    #     mimetype='application/json'
-    # )
     return return_value
   
 
 if __name__ == '__main__':
-  
+    CORS(app)
     app.run(debug = True)
